@@ -3,7 +3,7 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-with open('app/gasleakage.pkl', 'rb') as f:
+with open('gasleakage.pkl', 'rb') as f:
     model = pickle.load(f)
 
 
@@ -30,16 +30,19 @@ async def predict(temperature: float, humidity: float, lpg: float):
         elif (new_temperature >= 18 and new_temperature <= 24) and (new_humidity >= 40 and new_humidity <= 57) and (new_lpg >= 0.004374):
             print("Cluster 1.2")
             is_leakage = True
-        elif (new_temperature >= 6 and new_temperature < 18) and (new_lpg >= 0.003954):
+        elif (new_temperature >= 18 and new_temperature <= 24) and (new_lpg >= 0.004374):
             print("Cluster 1.3")
-            is_leakage = True
-        elif (new_temperature < 6) and (new_lpg >= 0.003954):
+            is_leakage = True 
+        elif (new_temperature >= 6 and new_temperature < 18) and (new_lpg >= 0.003954):
             print("Cluster 1.4")
             is_leakage = True
-        else:
+        elif (new_temperature < 6) and (new_lpg >= 0.003673):
             print("Cluster 1.5")
+            is_leakage = True
+        else:
+            print("Cluster 1.6")
             if (new_lpg >= 0.004654):
-                print("Cluster 1.5.1")
+                print("Cluster 1.6.1")
                 is_leakage = True
     elif predicted_cluster[0] == 2:
         if (new_temperature >= 25 and new_temperature <= 30) and (new_humidity >= 52 and new_humidity <= 60) and (new_lpg >= 0.004654):
@@ -65,8 +68,17 @@ async def predict(temperature: float, humidity: float, lpg: float):
             is_leakage = True
         else:
             print("Cluster 2.8")
-            if (new_lpg >= 0.005355):
+            if (new_humidity >= 40 and new_humidity <= 60) and (new_lpg >= 0.004654):
                 print("Cluster 2.8.1")
+                is_leakage = True
+            elif (new_humidity >= 61 and new_humidity <= 75) and (new_lpg >= 0.004935):
+                print("Cluster 2.8.2")
+                is_leakage = True
+            elif (new_humidity > 75) and (new_lpg >= 0.005355):
+                print("Cluster 2.8.3")
+                is_leakage = True
+            elif (new_lpg >= 0.005355):
+                print("Cluster 2.8.4")
                 is_leakage = True
     elif predicted_cluster[0] == 0:
         if (new_humidity >= 60 and new_humidity <= 75) and (new_lpg >= 0.004935):
@@ -77,16 +89,31 @@ async def predict(temperature: float, humidity: float, lpg: float):
             is_leakage = True
         else:
             print("Cluster 0.3")
-            if (new_temperature >= 6 and new_temperature <= 18) and (new_lpg >= 0.003954):
+            if (new_temperature >= 18 and new_temperature <= 24) and (new_humidity > 60 and new_humidity <= 75) and (new_lpg >= 0.004935):
                 print("Cluster 0.3.1")
                 is_leakage = True
-            elif (new_temperature < 6) and (new_lpg >= 0.003673):
+            elif (new_temperature >= 18 and new_temperature <= 24) and (new_humidity > 75) and (new_lpg >= 0.005355):
                 print("Cluster 0.3.2")
+                is_leakage = True
+            elif (new_temperature < 18) and (new_humidity > 60 and new_humidity <= 75) and (new_lpg >= 0.004935):
+                print("Cluster 0.3.3")
+                is_leakage = True
+            elif (new_temperature < 18) and (new_humidity > 75) and (new_lpg >= 0.005355):
+                print("Cluster 0.3.4")
                 is_leakage = True
     else:
         print("Cluster 4")
         is_leakage = False
-    response = {'leakage': 'yes' if is_leakage else 'no'}
+
+    if is_leakage:
+        print("xyz")
+        leakage_value = "yes"
+    else:
+        print("pqr")
+        leakage_value = "no"
+
+    response = {"leakage": leakage_value}
+    print(response)
     return response
 
 
